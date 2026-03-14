@@ -11,13 +11,13 @@ from datetime import datetime
 import pytz
 import yfinance as yf
 import feedparser
-import google.generativeai as genai
+from google import genai
 
 # ── Clé API ──────────────────────────────────────────────────────
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     raise ValueError("❌  Variable GEMINI_API_KEY manquante !")
-genai.configure(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 PARIS_TZ = pytz.timezone("Europe/Paris")
 
@@ -92,7 +92,7 @@ def fetch_news():
 def generate_analysis(market_data, news_articles):
     """Utilise Gemini pour analyser et rédiger le rapport."""
     print("🤖  Génération de l'analyse via Gemini...")
-    model = genai.GenerativeModel("gemini-2.0-flash-lite")
+    
 
     now      = datetime.now(PARIS_TZ)
     date_str = now.strftime("%A %d %B %Y à %H:%M")
@@ -135,7 +135,7 @@ Génère un rapport JSON. Réponds UNIQUEMENT avec du JSON valide, sans balise m
 
 Sélectionne 6 à 8 actualités parmi celles fournies. Utilise UNIQUEMENT les URLs fournies, ne les invente pas."""
 
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(model="gemini-2.0-flash-lite", contents=prompt)
     text = response.text.strip()
 
     # Nettoyer les balises markdown si présentes
