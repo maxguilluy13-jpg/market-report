@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Report — Sunday 15 March 2026</title>
+<style>
+  :root {
+    --bg:#0f172a;--surface:#1e293b;--surface2:#334155;
+    --text:#f1f5f9;--muted:#94a3b8;--accent:#38bdf8;
+    --green:#22c55e;--red:#ef4444;--border:#334155;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  .container{max-width:860px;margin:0 auto;padding:2rem 1rem;}
+  header{margin-bottom:2.5rem;border-bottom:1px solid var(--border);padding-bottom:1.5rem;}
+  .header-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;}
+  .report-title{font-size:1.75rem;font-weight:700;color:var(--accent);}
+  .report-date{font-size:0.85rem;color:var(--muted);text-align:right;}
+  .period-badge{display:inline-block;background:var(--accent);color:#0f172a;font-size:0.75rem;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:0.5rem;}
+  .section{margin-bottom:2.5rem;}
+  .section-title{font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border);}
+  .indices-grid{display:flex;flex-direction:column;gap:0.5rem;}
+  .index-card{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1.1rem;}
+  .index-left{flex:1;}
+  .index-name{display:block;font-size:0.8rem;color:var(--muted);margin-bottom:2px;}
+  .index-price{font-size:1.1rem;font-weight:600;}
+  .index-price small{font-size:0.75rem;color:var(--muted);}
+  .index-mid{flex:0 0 90px;text-align:center;}
+  .index-right{font-size:1rem;font-weight:700;min-width:80px;text-align:right;}
+  .news-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1.1rem;margin-bottom:0.5rem;}
+  .news-item a{color:var(--text);text-decoration:none;font-size:0.93rem;font-weight:500;display:block;margin:0.3rem 0;}
+  .news-item a:hover{color:var(--accent);}
+  .impact-badge{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;}
+  .news-raison{display:block;font-size:0.78rem;color:var(--muted);margin-top:0.3rem;}
+  .text-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.2rem 1.4rem;font-size:0.93rem;line-height:1.75;color:#cbd5e1;}
+  .recommandation{border-left:3px solid var(--accent);}
+  .concept-titre{font-size:1.05rem;font-weight:700;color:var(--accent);margin-bottom:0.6rem;}
+  footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);text-align:center;font-size:0.75rem;color:var(--muted);}
+  @media(max-width:480px){.report-title{font-size:1.3rem;}.index-mid{display:none;}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="header-top">
+      <div>
+        <div class="report-title">📊 Market Report</div>
+        <div class="period-badge">Rapport du matin</div>
+      </div>
+      <div class="report-date">Sunday 15 March 2026<br>Mis à jour à 01:20</div>
+    </div>
+  </header>
+
+  <div class="section">
+    <div class="section-title">01 — Actualités & impact marché</div>
+    
+        <div class="news-item">
+          <span class="impact-badge" style="background:#dcfce7;color:#166534">↑ haussier</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/l-hebdo-des-pme/video-turhan-guldas-zendoner-zendoner-structure-le-doner-mondial-14-03_VN-202603140347.html" target="_blank" rel="noopener">Zendoner structure le marché du döner mondial</a>
+          <span class="news-raison">L'expansion de Zendoner dans le marché du döner mondial pourrait augmenter la confiance des investisseurs dans le secteur de la restauration rapide.</span>
+        </div>
+        <div class="news-item">
+          <span class="impact-badge" style="background:#f1f5f9;color:#475569">→ neutre</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/la-librairie-de-l-eco/la-librairie-de-l-eco-samedi-14-mars_EN-202603140336.html" target="_blank" rel="noopener">La librairie de l'éco du samedi 14 mars</a>
+          <span class="news-raison">La librairie de l'éco présente des informations générales sur l'économie sans avoir un impact direct sur les marchés financiers.</span>
+        </div>
+        <div class="news-item">
+          <span class="impact-badge" style="background:#dcfce7;color:#166534">↑ haussier</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/l-hebdo-des-pme/video-remy-bissuel-ageron-bissuel-ageron-bissuel-les-reseaux-electriques-14-03_VN-202603140299.html" target="_blank" rel="noopener">Ageron Bissuel : les réseaux électriques</a>
+          <span class="news-raison">L'amélioration des réseaux électriques par Ageron Bissuel pourrait avoir un impact positif sur les entreprises du secteur de l'énergie.</span>
+        </div>
+        <div class="news-item">
+          <span class="impact-badge" style="background:#dcfce7;color:#166534">↑ haussier</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/l-hebdo-des-pme/video-valentin-jmurco-animacore-animacore-ingenierie-et-etudes-techniques-14-03_VN-202603140273.html" target="_blank" rel="noopener">Animacore : ingénierie et études techniques</a>
+          <span class="news-raison">Les services d'ingénierie et d'études techniques d'Animacore pourraient soutenir la croissance des entreprises dans le secteur de la technologie.</span>
+        </div>
+        <div class="news-item">
+          <span class="impact-badge" style="background:#dcfce7;color:#166534">↑ haussier</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/focus-retail/video-face-a-shein-zara-lance-lefties-en-france_VN-202603140250.html" target="_blank" rel="noopener">Zara lance Lefties en France pour concurrencer Shein</a>
+          <span class="news-raison">La stratégie de Zara pour lancer Lefties en France pourrait renforcer sa position sur le marché de la mode et avoir un impact positif sur les actions de l'entreprise.</span>
+        </div>
+        <div class="news-item">
+          <span class="impact-badge" style="background:#f1f5f9;color:#475569">→ neutre</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/la-librairie-de-l-eco/video-la-librairie-de-l-eco-samedi-14-mars_VN-202603140338.html" target="_blank" rel="noopener">La librairie de l'éco du samedi 14 mars</a>
+          <span class="news-raison">La librairie de l'éco présente des informations générales sur l'économie sans avoir un impact direct sur les marchés financiers.</span>
+        </div>
+        <div class="news-item">
+          <span class="impact-badge" style="background:#dcfce7;color:#166534">↑ haussier</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/l-hebdo-des-pme/video-remy-bissuel-ageron-bissuel-ageron-bissuel-les-reseaux-electriques-14-03_VN-202603140299.html" target="_blank" rel="noopener">Rémy Bissuel (Ageron Bissuel) : les réseaux électriques</a>
+          <span class="news-raison">L'amélioration des réseaux électriques par Ageron Bissuel pourrait avoir un impact positif sur les entreprises du secteur de l'énergie.</span>
+        </div>
+        <div class="news-item">
+          <span class="impact-badge" style="background:#dcfce7;color:#166534">↑ haussier</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/l-hebdo-des-pme/video-valentin-jmurco-animacore-animacore-ingenierie-et-etudes-techniques-14-03_VN-202603140273.html" target="_blank" rel="noopener">Valentin Jmurco (Animacore) : ingénierie et études techniques</a>
+          <span class="news-raison">Les services d'ingénierie et d'études techniques d'Animacore pourraient soutenir la croissance des entreprises dans le secteur de la technologie.</span>
+        </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">02 — Indices boursiers</div>
+    <div class="indices-grid">
+        <div class="index-card">
+          <div class="index-left">
+            <span class="index-name">CAC 40</span>
+            <span class="index-price">N/A <small>pts</small></span>
+          </div>
+          <div class="index-mid"></div>
+          <div class="index-right" style="color:#22c55e">
+            ▲ +0.00%
+          </div>
+        </div>
+        <div class="index-card">
+          <div class="index-left">
+            <span class="index-name">S&P 500</span>
+            <span class="index-price">N/A <small>pts</small></span>
+          </div>
+          <div class="index-mid"></div>
+          <div class="index-right" style="color:#22c55e">
+            ▲ +0.00%
+          </div>
+        </div>
+        <div class="index-card">
+          <div class="index-left">
+            <span class="index-name">Nasdaq</span>
+            <span class="index-price">N/A <small>pts</small></span>
+          </div>
+          <div class="index-mid"></div>
+          <div class="index-right" style="color:#22c55e">
+            ▲ +0.00%
+          </div>
+        </div>
+        <div class="index-card">
+          <div class="index-left">
+            <span class="index-name">DAX</span>
+            <span class="index-price">N/A <small>pts</small></span>
+          </div>
+          <div class="index-mid"></div>
+          <div class="index-right" style="color:#22c55e">
+            ▲ +0.00%
+          </div>
+        </div>
+        <div class="index-card">
+          <div class="index-left">
+            <span class="index-name">EUR/USD</span>
+            <span class="index-price">N/A <small></small></span>
+          </div>
+          <div class="index-mid"></div>
+          <div class="index-right" style="color:#22c55e">
+            ▲ +0.00%
+          </div>
+        </div>
+        <div class="index-card">
+          <div class="index-left">
+            <span class="index-name">VIX</span>
+            <span class="index-price">N/A <small></small></span>
+          </div>
+          <div class="index-mid"></div>
+          <div class="index-right" style="color:#22c55e">
+            ▲ +0.00%
+          </div>
+        </div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">03 — Analyse & recommandation</div>
+    <div class="text-block" style="margin-bottom:0.8rem">Aujourd'hui, les marchés financiers sont influencés par divers facteurs, notamment l'expansion de Zendoner dans le marché du döner mondial, l'amélioration des réseaux électriques par Ageron Bissuel et les services d'ingénierie et d'études techniques d'Animacore. Ces développements pourraient avoir un impact positif sur les entreprises concernées. Cependant, il est important de considérer l'ensemble des facteurs économiques et financiers pour prendre des décisions d'investissement éclairées.</div>
+    <div class="text-block recommandation">En tant qu'investisseur particulier, il est recommandé de surveiller de près les développements dans les secteurs de la restauration rapide, de l'énergie et de la technologie. Il est également important de diversifier son portefeuille pour minimiser les risques. Il est essentiel de rappeler que ces recommandations ne constituent pas des conseils financiers officiels et qu'il est toujours préférable de consulter un professionnel de la finance avant de prendre des décisions d'investissement.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">04 — Concept du jour</div>
+    <div class="text-block">
+      <div class="concept-titre">💡 Diversification</div>
+      La diversification est une stratégie d'investissement qui consiste à répartir son portefeuille entre différents types d'actifs, tels que les actions, les obligations et les fonds immobiliers. Cette stratégie permet de minimiser les risques et de maximiser les rendements à long terme. La diversification est essentielle pour les investisseurs particuliers qui souhaitent protéger leur patrimoine et atteindre leurs objectifs financiers.
+    </div>
+  </div>
+
+  <footer>Rapport généré automatiquement · Données à titre informatif uniquement · Pas un conseil en investissement</footer>
+</div>
+</body>
+</html>
