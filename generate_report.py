@@ -2,7 +2,7 @@
 """
 ╔══════════════════════════════════════════╗
 ║       MARKET REPORT — Générateur        ║
-║  Gemini API + yfinance + RSS             ║
+║  Groq API + yfinance + RSS               ║
 ╚══════════════════════════════════════════╝
 """
 
@@ -11,13 +11,13 @@ from datetime import datetime
 import pytz
 import yfinance as yf
 import feedparser
-from google import genai
+from groq import Groq
 
 # ── Clé API ──────────────────────────────────────────────────────
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-if not GEMINI_API_KEY:
-    raise ValueError("❌  Variable GEMINI_API_KEY manquante !")
-client = genai.Client(api_key=GEMINI_API_KEY)
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+if not GROQ_API_KEY:
+    raise ValueError("❌  Variable GROQ_API_KEY manquante !")
+client = Groq(api_key=GROQ_API_KEY)
 
 PARIS_TZ = pytz.timezone("Europe/Paris")
 
@@ -135,8 +135,12 @@ Génère un rapport JSON. Réponds UNIQUEMENT avec du JSON valide, sans balise m
 
 Sélectionne 6 à 8 actualités parmi celles fournies. Utilise UNIQUEMENT les URLs fournies, ne les invente pas."""
 
-    response = client.models.generate_content(model="gemini-2.0-flash-lite", contents=prompt)
-    text = response.text.strip()
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3,
+    )
+    text = response.choices[0].message.content.strip()
 
     # Nettoyer les balises markdown si présentes
     text = re.sub(r"^```json\s*", "", text)
