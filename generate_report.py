@@ -6,12 +6,21 @@
 ╚══════════════════════════════════════════╝
 """
 
-import os, json, re
+import os, json, re, time
 from datetime import datetime
 import pytz
+import requests
 import yfinance as yf
 import feedparser
 from groq import Groq
+
+# ── Session avec User-Agent pour contourner le blocage Yahoo ─────
+YF_SESSION = requests.Session()
+YF_SESSION.headers.update({
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.8",
+})
 
 # ── Clé API ──────────────────────────────────────────────────────
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
@@ -42,46 +51,43 @@ RSS_FEEDS = [
 # ════════════════════════════════════════════════════════════════
 # 1. DONNÉES DE MARCHÉ
 # ════════════════════════════════════════════════════════════════
+def fetch_ticker(ticker_symbol):
+    """Télécharge un ticker avec retry et session custom."""
+    for attempt in range(3):
+        try:
+            t = yf.Ticker(ticker_symbol, session=YF_SESSION)
+            hist = t.history(period="5d", interval="1d")
+            if hist is not None and len(hist) >= 2:
+                closes = hist["Close"].dropna()
+                if len(closes) >= 2:
+                    return closes
+            time.sleep(2)
+        except Exception as e:
+            print(f"      tentative {attempt+1}/3 échouée: {e}")
+            time.sleep(3)
+    return None
+
 def fetch_market_data():
     """Récupère les cours et variations via yfinance."""
     print("📈  Récupération des cours...")
     data = {}
     for name, cfg in INDICES.items():
-        try:
-            hist = yf.download(
-                cfg["ticker"],
-                period="7d",
-                interval="1d",
-                auto_adjust=True,
-                progress=False,
-            )
-            if hist is not None and len(hist) >= 2:
-                closes = hist["Close"].dropna()
-                if len(closes) >= 2:
-                    current = float(closes.iloc[-1])
-                    prev    = float(closes.iloc[-2])
-                    change  = ((current - prev) / prev) * 100
-                    history = [float(x) for x in closes.tolist()[-5:]]
-                    data[name] = {
-                        "price":   current,
-                        "change":  change,
-                        "history": history,
-                        "devise":  cfg["devise"],
-                    }
-                    print(f"   ✓ {name}: {current:.2f} ({change:+.2f}%)")
-                else:
-                    raise ValueError("Pas assez de données")
-            else:
-                raise ValueError("Données vides")
-        except Exception as e:
-            print(f"   ⚠️  Erreur {name}: {e}")
-            # Valeur placeholder pour ne pas planter la suite
+        closes = fetch_ticker(cfg["ticker"])
+        if closes is not None:
+            current = float(closes.iloc[-1])
+            prev    = float(closes.iloc[-2])
+            change  = ((current - prev) / prev) * 100
+            history = [float(x) for x in closes.tolist()[-5:]]
             data[name] = {
-                "price":   0.0,
-                "change":  0.0,
-                "history": [],
+                "price":   current,
+                "change":  change,
+                "history": history,
                 "devise":  cfg["devise"],
             }
+            print(f"   ✓ {name}: {current:.2f} ({change:+.2f}%)")
+        else:
+            print(f"   ⚠️  {name}: données indisponibles")
+            data[name] = {"price": 0.0, "change": 0.0, "history": [], "devise": cfg["devise"]}
     return data
 
 # ════════════════════════════════════════════════════════════════
@@ -158,19 +164,15 @@ Sélectionne 6 à 8 actualités. Utilise UNIQUEMENT les URLs fournies, ne les in
         temperature=0.3,
     )
     text = response.choices[0].message.content.strip()
-
-    # Nettoyer les balises markdown si présentes
     text = re.sub(r"^```json\s*", "", text)
     text = re.sub(r"^```\s*",     "", text)
     text = re.sub(r"\s*```$",     "", text)
-
     return json.loads(text.strip())
 
 # ════════════════════════════════════════════════════════════════
 # 4. GÉNÉRATION HTML
 # ════════════════════════════════════════════════════════════════
 def sparkline_svg(values):
-    """Génère un mini graphique SVG sparkline."""
     if not values or len(values) < 2:
         return ""
     mn, mx = min(values), max(values)
@@ -186,19 +188,16 @@ def sparkline_svg(values):
     return f'<svg width="{w}" height="{h}" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg"><polyline points="{polyline_pts}" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 
 def generate_html(market_data, analysis, now):
-    """Génère le fichier HTML complet du rapport."""
-
     date_fr  = now.strftime("%A %d %B %Y")
     heure_fr = now.strftime("%H:%M")
     period   = "Rapport du matin" if now.hour < 13 else "Rapport du soir"
 
-    # ── Extraire les données analyse AVANT le f-string ───────────
-    analyse_txt       = analysis.get("analyse", "")
+    analyse_txt        = analysis.get("analyse", "")
     recommandation_txt = analysis.get("recommandation", "")
-    concept_titre     = analysis.get("concept_titre", "")
-    concept_def       = analysis.get("concept_definition", "")
+    concept_titre      = analysis.get("concept_titre", "")
+    concept_def        = analysis.get("concept_definition", "")
 
-    # ── Section indices ──────────────────────────────────────────
+    # ── Indices ──────────────────────────────────────────────────
     indices_html = ""
     for name, d in market_data.items():
         sign    = "+" if d["change"] >= 0 else ""
@@ -218,12 +217,10 @@ def generate_html(market_data, analysis, now):
             <span class="index-price">{price_fmt} <small>{d["devise"]}</small></span>
           </div>
           <div class="index-mid">{sparkle}</div>
-          <div class="index-right" style="color:{color}">
-            {arrow} {sign}{d["change"]:.2f}%
-          </div>
+          <div class="index-right" style="color:{color}">{arrow} {sign}{d["change"]:.2f}%</div>
         </div>"""
 
-    # ── Section news ─────────────────────────────────────────────
+    # ── News ─────────────────────────────────────────────────────
     impact_colors = {
         "haussier": ("#dcfce7", "#166534", "↑"),
         "baissier": ("#fee2e2", "#991b1b", "↓"),
@@ -247,11 +244,7 @@ def generate_html(market_data, analysis, now):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Market Report — {date_fr}</title>
 <style>
-  :root {{
-    --bg:#0f172a;--surface:#1e293b;--surface2:#334155;
-    --text:#f1f5f9;--muted:#94a3b8;--accent:#38bdf8;
-    --green:#22c55e;--red:#ef4444;--border:#334155;
-  }}
+  :root {{--bg:#0f172a;--surface:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--accent:#38bdf8;--border:#334155;}}
   *{{box-sizing:border-box;margin:0;padding:0;}}
   body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}}
   .container{{max-width:860px;margin:0 auto;padding:2rem 1rem;}}
@@ -264,19 +257,15 @@ def generate_html(market_data, analysis, now):
   .section-title{{font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border);}}
   .indices-grid{{display:flex;flex-direction:column;gap:0.5rem;}}
   .index-card{{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1.1rem;}}
-  .index-left{{flex:1;}}
-  .index-name{{display:block;font-size:0.8rem;color:var(--muted);margin-bottom:2px;}}
-  .index-price{{font-size:1.1rem;font-weight:600;}}
-  .index-price small{{font-size:0.75rem;color:var(--muted);}}
-  .index-mid{{flex:0 0 90px;text-align:center;}}
-  .index-right{{font-size:1rem;font-weight:700;min-width:80px;text-align:right;}}
+  .index-left{{flex:1;}}.index-name{{display:block;font-size:0.8rem;color:var(--muted);margin-bottom:2px;}}
+  .index-price{{font-size:1.1rem;font-weight:600;}}.index-price small{{font-size:0.75rem;color:var(--muted);}}
+  .index-mid{{flex:0 0 90px;text-align:center;}}.index-right{{font-size:1rem;font-weight:700;min-width:80px;text-align:right;}}
   .news-item{{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1.1rem;margin-bottom:0.5rem;}}
   .news-item a{{color:var(--text);text-decoration:none;font-size:0.93rem;font-weight:500;display:block;margin:0.3rem 0;}}
-  .news-item a:hover{{color:var(--accent);}}
-  .impact-badge{{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;}}
+  .news-item a:hover{{color:var(--accent);}}.impact-badge{{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;}}
   .news-raison{{display:block;font-size:0.78rem;color:var(--muted);margin-top:0.3rem;}}
   .text-block{{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.2rem 1.4rem;font-size:0.93rem;line-height:1.75;color:#cbd5e1;}}
-  .recommandation{{border-left:3px solid var(--accent);}}
+  .recommandation{{border-left:3px solid var(--accent);margin-top:0.8rem;}}
   .concept-titre{{font-size:1.05rem;font-weight:700;color:var(--accent);margin-bottom:0.6rem;}}
   footer{{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);text-align:center;font-size:0.75rem;color:var(--muted);}}
   @media(max-width:480px){{.report-title{{font-size:1.3rem;}}.index-mid{{display:none;}}}}
@@ -293,23 +282,19 @@ def generate_html(market_data, analysis, now):
       <div class="report-date">{date_fr}<br>Mis à jour à {heure_fr}</div>
     </div>
   </header>
-
   <div class="section">
     <div class="section-title">01 — Actualités & impact marché</div>
     {news_html}
   </div>
-
   <div class="section">
     <div class="section-title">02 — Indices boursiers</div>
     <div class="indices-grid">{indices_html}</div>
   </div>
-
   <div class="section">
     <div class="section-title">03 — Analyse & recommandation</div>
-    <div class="text-block" style="margin-bottom:0.8rem">{analyse_txt}</div>
+    <div class="text-block">{analyse_txt}</div>
     <div class="text-block recommandation">{recommandation_txt}</div>
   </div>
-
   <div class="section">
     <div class="section-title">04 — Concept du jour</div>
     <div class="text-block">
@@ -317,7 +302,6 @@ def generate_html(market_data, analysis, now):
       {concept_def}
     </div>
   </div>
-
   <footer>Rapport généré automatiquement · Données à titre informatif uniquement · Pas un conseil en investissement</footer>
 </div>
 </body>
@@ -329,16 +313,13 @@ def generate_html(market_data, analysis, now):
 def main():
     now = datetime.now(PARIS_TZ)
     print(f"\n🚀  Génération du rapport — {now.strftime('%d/%m/%Y %H:%M')}\n")
-
     market_data = fetch_market_data()
     news        = fetch_news()
     analysis    = generate_analysis(market_data, news)
     html        = generate_html(market_data, analysis, now)
-
     os.makedirs("docs", exist_ok=True)
     with open("docs/index.html", "w", encoding="utf-8") as f:
         f.write(html)
-
     print("\n✅  Rapport généré → docs/index.html")
 
 if __name__ == "__main__":
