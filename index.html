@@ -5,11 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Market Report — Tuesday 17 March 2026</title>
 <style>
-  :root {
-    --bg:#0f172a;--surface:#1e293b;--surface2:#334155;
-    --text:#f1f5f9;--muted:#94a3b8;--accent:#38bdf8;
-    --green:#22c55e;--red:#ef4444;--border:#334155;
-  }
+  :root {--bg:#0f172a;--surface:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--accent:#38bdf8;--border:#334155;}
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
   .container{max-width:860px;margin:0 auto;padding:2rem 1rem;}
@@ -22,19 +18,15 @@
   .section-title{font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border);}
   .indices-grid{display:flex;flex-direction:column;gap:0.5rem;}
   .index-card{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1.1rem;}
-  .index-left{flex:1;}
-  .index-name{display:block;font-size:0.8rem;color:var(--muted);margin-bottom:2px;}
-  .index-price{font-size:1.1rem;font-weight:600;}
-  .index-price small{font-size:0.75rem;color:var(--muted);}
-  .index-mid{flex:0 0 90px;text-align:center;}
-  .index-right{font-size:1rem;font-weight:700;min-width:80px;text-align:right;}
+  .index-left{flex:1;}.index-name{display:block;font-size:0.8rem;color:var(--muted);margin-bottom:2px;}
+  .index-price{font-size:1.1rem;font-weight:600;}.index-price small{font-size:0.75rem;color:var(--muted);}
+  .index-mid{flex:0 0 90px;text-align:center;}.index-right{font-size:1rem;font-weight:700;min-width:80px;text-align:right;}
   .news-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1.1rem;margin-bottom:0.5rem;}
   .news-item a{color:var(--text);text-decoration:none;font-size:0.93rem;font-weight:500;display:block;margin:0.3rem 0;}
-  .news-item a:hover{color:var(--accent);}
-  .impact-badge{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;}
+  .news-item a:hover{color:var(--accent);}.impact-badge{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;}
   .news-raison{display:block;font-size:0.78rem;color:var(--muted);margin-top:0.3rem;}
   .text-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.2rem 1.4rem;font-size:0.93rem;line-height:1.75;color:#cbd5e1;}
-  .recommandation{border-left:3px solid var(--accent);}
+  .recommandation{border-left:3px solid var(--accent);margin-top:0.8rem;}
   .concept-titre{font-size:1.05rem;font-weight:700;color:var(--accent);margin-bottom:0.6rem;}
   footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);text-align:center;font-size:0.75rem;color:var(--muted);}
   @media(max-width:480px){.report-title{font-size:1.3rem;}.index-mid{display:none;}}
@@ -46,47 +38,50 @@
     <div class="header-top">
       <div>
         <div class="report-title">📊 Market Report</div>
-        <div class="period-badge">Rapport du matin</div>
+        <div class="period-badge">Rapport du soir</div>
       </div>
-      <div class="report-date">Tuesday 17 March 2026<br>Mis à jour à 11:10</div>
+      <div class="report-date">Tuesday 17 March 2026<br>Mis à jour à 19:04</div>
     </div>
   </header>
-
   <div class="section">
     <div class="section-title">01 — Actualités & impact marché</div>
     
         <div class="news-item">
+          <span class="impact-badge" style="background:#fee2e2;color:#991b1b">↓ baissier</span>
+          <a href="https://www.bfmtv.com/economie/consommation/ce-sera-une-premiere-chez-leboncoin-selon-les-syndicats-une-greve-est-prevue-ce-mercredi-sur-le-site-rachete-en-2024-par-deux-fonds-anglo-saxons_AD-202603170816.html" target="_blank" rel="noopener">Grève prévue chez Leboncoin</a>
+          <span class="news-raison">La grève pourrait affecter la disponibilité des services de Leboncoin et avoir un impact négatif sur les marchés.</span>
+        </div>
+        <div class="news-item">
           <span class="impact-badge" style="background:#f1f5f9;color:#475569">→ neutre</span>
-          <a href="https://www.bfmtv.com/economie/replay-emissions/les-experts/l-integrale-des-experts-du-mardi-17-mars_EN-202603170394.html" target="_blank" rel="noopener">L'intégrale des Experts du mardi 17 mars</a>
-          <span class="news-raison">Cette émission présente une revue générale des actualités économiques du jour sans prendre position.</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/la-grande-interview/video-grande-interview-olivier-gantois-ufip-em-comment-contourner-le-detroit-d-ormuz-17-03_VN-202603170803.html" target="_blank" rel="noopener">Comment contourner le détroit d'Ormuz ?</a>
+          <span class="news-raison">Cette interview pourrait fournir des informations intéressantes sur les stratégies énergétiques, mais n'a pas d'impact direct sur les marchés.</span>
+        </div>
+        <div class="news-item">
+          <span class="impact-badge" style="background:#f1f5f9;color:#475569">→ neutre</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/la-grande-interview/grande-interview-olivier-gantois-president-de-l-ufip-energies-et-mobilites-17-03_EN-202603170796.html" target="_blank" rel="noopener">Grande Interview - Olivier Gantois, président de l'Ufip Énergies et Mobilités</a>
+          <span class="news-raison">Cette interview pourrait fournir des informations intéressantes sur les tendances énergétiques, mais n'a pas d'impact direct sur les marchés.</span>
         </div>
         <div class="news-item">
           <span class="impact-badge" style="background:#fee2e2;color:#991b1b">↓ baissier</span>
-          <a href="https://www.bfmtv.com/economie/replay-emissions/les-experts/les-experts-competitivite-francaise-l-alerte-de-rexecode-17-03_EN-202603170393.html" target="_blank" rel="noopener">Compétitivité française, l'alerte de Rexecode</a>
-          <span class="news-raison">L'alerte sur la compétitivité française pourrait avoir un impact négatif sur les marchés financiers en raison des inquiétudes sur la croissance économique.</span>
-        </div>
-        <div class="news-item">
-          <span class="impact-badge" style="background:#dcfce7;color:#166534">↑ haussier</span>
-          <a href="https://www.bfmtv.com/economie/replay-emissions/good-morning-market/video-si-ormuz-reste-bloque-le-petrole-ne-restera-pas-a-100-dollars_VN-202603170380.html" target="_blank" rel="noopener">Si Ormuz reste bloqué, le pétrole ne restera pas à 100 dollars</a>
-          <span class="news-raison">Une augmentation potentielle du prix du pétrole pourrait avoir un impact positif sur les actions des entreprises pétrolières.</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/le-18h-eco/video-petrole-pourquoi-l-annonce-de-l-aie-ne-fait-pas-baisser-les-prix_VN-202603170792.html" target="_blank" rel="noopener">Pétrole : pourquoi l’annonce de l’AIE ne fait pas baisser les prix ?</a>
+          <span class="news-raison">L'annonce de l'AIE n'a pas eu l'effet escompté sur les prix du pétrole, ce qui pourrait avoir un impact négatif sur les marchés.</span>
         </div>
         <div class="news-item">
           <span class="impact-badge" style="background:#f1f5f9;color:#475569">→ neutre</span>
-          <a href="https://www.bfmtv.com/economie/replay-emissions/les-experts/les-experts-ormuz-l-europe-refuse-de-suivre-donald-trump-17-03_EN-202603170364.html" target="_blank" rel="noopener">Ormuz, l'Europe refuse de suivre Donald Trump</a>
-          <span class="news-raison">La position de l'Europe sur Ormuz pourrait avoir des implications géopolitiques sans impact direct sur les marchés financiers.</span>
-        </div>
-        <div class="news-item">
-          <span class="impact-badge" style="background:#fee2e2;color:#991b1b">↓ baissier</span>
-          <a href="https://www.bfmtv.com/economie/replay-emissions/les-experts/video-les-experts-competitivite-francaise-l-alerte-de-rexecode-17-03_VN-202603170396.html" target="_blank" rel="noopener">Compétitivité française, l'alerte de Rexecode en vidéo</a>
-          <span class="news-raison">L'alerte sur la compétitivité française souligne les défis économiques auxquels la France est confrontée, ce qui pourrait affecter négativement les investissements.</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/bfm-bourse/video-bfm-bourse-mardi-17-mars_VN-202603170819.html" target="_blank" rel="noopener">BFM Bourse - Mardi 17 mars</a>
+          <span class="news-raison">Cette émission de bourse pourrait fournir des informations intéressantes sur les marchés, mais n'a pas d'impact direct sur les marchés.</span>
         </div>
         <div class="news-item">
           <span class="impact-badge" style="background:#f1f5f9;color:#475569">→ neutre</span>
-          <a href="https://www.bfmtv.com/economie/replay-emissions/les-experts/video-les-experts-ormuz-l-europe-refuse-de-suivre-donald-trump-17-03_VN-202603170370.html" target="_blank" rel="noopener">Ormuz, l'Europe refuse de suivre Donald Trump en vidéo</a>
-          <span class="news-raison">La position de l'Europe sur Ormuz est une question géopolitique qui pourrait avoir des implications à long terme sans impact immédiat sur les marchés.</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/bfm-bourse/l-integrale-de-bfm-bourse-du-mardi-17-mars_EN-202603170781.html" target="_blank" rel="noopener">L'intégrale de BFM Bourse du mardi 17 mars</a>
+          <span class="news-raison">Cette émission de bourse pourrait fournir des informations intéressantes sur les marchés, mais n'a pas d'impact direct sur les marchés.</span>
+        </div>
+        <div class="news-item">
+          <span class="impact-badge" style="background:#f1f5f9;color:#475569">→ neutre</span>
+          <a href="https://www.bfmtv.com/economie/replay-emissions/la-grande-interview/video-grande-interview-olivier-gantois-ufip-em-comment-contourner-le-detroit-d-ormuz-17-03_VN-202603170803.html" target="_blank" rel="noopener">Grande Interview - Olivier Gantois (Ufip EM) : Comment contourner le détroit d'Ormuz ?</a>
+          <span class="news-raison">Cette interview pourrait fournir des informations intéressantes sur les stratégies énergétiques, mais n'a pas d'impact direct sur les marchés.</span>
         </div>
   </div>
-
   <div class="section">
     <div class="section-title">02 — Indices boursiers</div>
     <div class="indices-grid">
@@ -96,9 +91,7 @@
             <span class="index-price">N/A <small>pts</small></span>
           </div>
           <div class="index-mid"></div>
-          <div class="index-right" style="color:#22c55e">
-            ▲ +0.00%
-          </div>
+          <div class="index-right" style="color:#22c55e">▲ +0.00%</div>
         </div>
         <div class="index-card">
           <div class="index-left">
@@ -106,9 +99,7 @@
             <span class="index-price">N/A <small>pts</small></span>
           </div>
           <div class="index-mid"></div>
-          <div class="index-right" style="color:#22c55e">
-            ▲ +0.00%
-          </div>
+          <div class="index-right" style="color:#22c55e">▲ +0.00%</div>
         </div>
         <div class="index-card">
           <div class="index-left">
@@ -116,9 +107,7 @@
             <span class="index-price">N/A <small>pts</small></span>
           </div>
           <div class="index-mid"></div>
-          <div class="index-right" style="color:#22c55e">
-            ▲ +0.00%
-          </div>
+          <div class="index-right" style="color:#22c55e">▲ +0.00%</div>
         </div>
         <div class="index-card">
           <div class="index-left">
@@ -126,9 +115,7 @@
             <span class="index-price">N/A <small>pts</small></span>
           </div>
           <div class="index-mid"></div>
-          <div class="index-right" style="color:#22c55e">
-            ▲ +0.00%
-          </div>
+          <div class="index-right" style="color:#22c55e">▲ +0.00%</div>
         </div>
         <div class="index-card">
           <div class="index-left">
@@ -136,9 +123,7 @@
             <span class="index-price">N/A <small></small></span>
           </div>
           <div class="index-mid"></div>
-          <div class="index-right" style="color:#22c55e">
-            ▲ +0.00%
-          </div>
+          <div class="index-right" style="color:#22c55e">▲ +0.00%</div>
         </div>
         <div class="index-card">
           <div class="index-left">
@@ -146,26 +131,21 @@
             <span class="index-price">N/A <small></small></span>
           </div>
           <div class="index-mid"></div>
-          <div class="index-right" style="color:#22c55e">
-            ▲ +0.00%
-          </div>
+          <div class="index-right" style="color:#22c55e">▲ +0.00%</div>
         </div></div>
   </div>
-
   <div class="section">
     <div class="section-title">03 — Analyse & recommandation</div>
-    <div class="text-block" style="margin-bottom:0.8rem">Aujourd'hui, les marchés sont influencés par des facteurs géopolitiques et économiques, notamment la situation à Ormuz et les inquiétudes sur la compétitivité française. Les prix du pétrole pourraient augmenter si la situation à Ormuz se dégrade, ce qui aurait des implications pour les entreprises pétrolières. La position de l'Europe sur ces questions est cruciale pour comprendre les tendances futures.</div>
-    <div class="text-block recommandation">Il est important pour les investisseurs de surveiller de près l'évolution de la situation à Ormuz et les indicateurs économiques français. Une diversification des portefeuilles pourrait être une stratégie prudente pour gérer les risques potentiels. Il est essentiel de consulter un conseiller financier avant de prendre des décisions d'investissement, car ce n'est pas un conseil financier officiel.</div>
+    <div class="text-block">Les marchés sont actuellement influencés par des facteurs tels que la grève prévue chez Leboncoin et l'annonce de l'AIE sur les prix du pétrole. Les investisseurs doivent être prudents et surveiller de près les développements futurs. Les émissions de bourse et les interviews d'experts peuvent fournir des informations précieuses pour prendre des décisions éclairées. Cependant, il est important de noter que les marchés sont actuellement volatils et que les investisseurs doivent être prêts à adapter leurs stratégies en conséquence.</div>
+    <div class="text-block recommandation">Les investisseurs particuliers doivent être prudents et diversifier leurs portefeuilles pour minimiser les risques. Il est important de surveiller de près les développements futurs et de s'adapter aux changements du marché. Il est également recommandé de consulter un conseiller financier avant de prendre des décisions d'investissement. Il est important de rappeler que ce n'est pas un conseil financier officiel et que les investisseurs doivent prendre leurs propres décisions en fonction de leurs objectifs et de leurs tolérances au risque.</div>
   </div>
-
   <div class="section">
     <div class="section-title">04 — Concept du jour</div>
     <div class="text-block">
-      <div class="concept-titre">💡 Compétitivité économique</div>
-      La compétitivité économique se réfère à la capacité d'un pays ou d'une entreprise à produire des biens et des services de manière efficace et à les vendre à des prix compétitifs sur les marchés mondiaux. Cela implique des facteurs tels que la productivité, les coûts de production, la qualité des produits et la capacité à innover. Une forte compétitivité économique est essentielle pour attirer les investissements, créer des emplois et stimuler la croissance économique.
+      <div class="concept-titre">💡 Diversification</div>
+      La diversification est une stratégie d'investissement qui consiste à répartir les investissements dans différents actifs pour minimiser les risques. Cela peut inclure des investissements dans des actions, des obligations, des fonds mutuels, des biens immobiliers, etc. La diversification peut aider à réduire les risques et à augmenter les rendements à long terme. Il est important de noter que la diversification ne garantit pas des rendements positifs, mais elle peut aider à minimiser les pertes en cas de déclin du marché.
     </div>
   </div>
-
   <footer>Rapport généré automatiquement · Données à titre informatif uniquement · Pas un conseil en investissement</footer>
 </div>
 </body>
