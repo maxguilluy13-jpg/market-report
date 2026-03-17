@@ -2,3 +2,4 @@ yfinance==0.2.43
 groq==0.13.0
 feedparser==6.0.11
 pytz==2024.2
+requests==2.31.0
