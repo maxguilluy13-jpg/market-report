@@ -2,7 +2,7 @@
 """
 ╔══════════════════════════════════════════╗
 ║       MARKET REPORT — Générateur        ║
-║  Groq API + yfinance + RSS               ║
+║  Groq API + Yahoo API direct + RSS       ║
 ╚══════════════════════════════════════════╝
 """
 
@@ -10,17 +10,8 @@ import os, json, re, time
 from datetime import datetime
 import pytz
 import requests
-import yfinance as yf
 import feedparser
 from groq import Groq
-
-# ── Session avec User-Agent pour contourner le blocage Yahoo ─────
-YF_SESSION = requests.Session()
-YF_SESSION.headers.update({
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.8",
-})
 
 # ── Clé API ──────────────────────────────────────────────────────
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
@@ -30,17 +21,25 @@ client = Groq(api_key=GROQ_API_KEY)
 
 PARIS_TZ = pytz.timezone("Europe/Paris")
 
-# ── Indices boursiers à suivre ───────────────────────────────────
-INDICES = {
-    "CAC 40":  {"ticker": "^FCHI",    "devise": "pts"},
-    "S&P 500": {"ticker": "^GSPC",    "devise": "pts"},
-    "Nasdaq":  {"ticker": "^IXIC",    "devise": "pts"},
-    "DAX":     {"ticker": "^GDAXI",   "devise": "pts"},
-    "EUR/USD": {"ticker": "EURUSD=X", "devise": ""},
-    "VIX":     {"ticker": "^VIX",     "devise": ""},
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    "Accept": "application/json",
+    "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Referer": "https://finance.yahoo.com/",
+    "Origin": "https://finance.yahoo.com",
 }
 
-# ── Flux RSS d'actualités économiques ───────────────────────────
+# ── Indices boursiers ────────────────────────────────────────────
+INDICES = {
+    "CAC 40":  {"ticker": "%5EFCHI",   "devise": "pts"},
+    "S&P 500": {"ticker": "%5EGSPC",   "devise": "pts"},
+    "Nasdaq":  {"ticker": "%5EIXIC",   "devise": "pts"},
+    "DAX":     {"ticker": "%5EGDAXI",  "devise": "pts"},
+    "EUR/USD": {"ticker": "EURUSD%3DX","devise": ""},
+    "VIX":     {"ticker": "%5EVIX",    "devise": ""},
+}
+
+# ── Flux RSS ─────────────────────────────────────────────────────
 RSS_FEEDS = [
     "https://feeds.reuters.com/reuters/businessNews",
     "https://www.bfmtv.com/rss/economie/",
@@ -49,41 +48,48 @@ RSS_FEEDS = [
 ]
 
 # ════════════════════════════════════════════════════════════════
-# 1. DONNÉES DE MARCHÉ
+# 1. DONNÉES DE MARCHÉ — appel direct Yahoo Finance v8
 # ════════════════════════════════════════════════════════════════
-def fetch_ticker(ticker_symbol):
-    """Télécharge un ticker avec retry et session custom."""
+def fetch_ticker(ticker_encoded):
+    """Appel direct à l'API Yahoo Finance v8 chart."""
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker_encoded}?interval=1d&range=10d"
     for attempt in range(3):
         try:
-            t = yf.Ticker(ticker_symbol, session=YF_SESSION)
-            hist = t.history(period="5d", interval="1d")
-            if hist is not None and len(hist) >= 2:
-                closes = hist["Close"].dropna()
-                if len(closes) >= 2:
-                    return closes
-            time.sleep(2)
+            r = requests.get(url, headers=HEADERS, timeout=10)
+            r.raise_for_status()
+            data = r.json()
+            closes = data["chart"]["result"][0]["indicators"]["quote"][0]["close"]
+            closes = [c for c in closes if c is not None]
+            if len(closes) >= 2:
+                return closes
         except Exception as e:
-            print(f"      tentative {attempt+1}/3 échouée: {e}")
-            time.sleep(3)
+            print(f"      tentative {attempt+1}/3: {e}")
+            time.sleep(2)
+    # Fallback: essayer query2
+    url2 = url.replace("query1", "query2")
+    try:
+        r = requests.get(url2, headers=HEADERS, timeout=10)
+        r.raise_for_status()
+        data = r.json()
+        closes = data["chart"]["result"][0]["indicators"]["quote"][0]["close"]
+        closes = [c for c in closes if c is not None]
+        if len(closes) >= 2:
+            return closes
+    except Exception as e:
+        print(f"      fallback échoué: {e}")
     return None
 
 def fetch_market_data():
-    """Récupère les cours et variations via yfinance."""
     print("📈  Récupération des cours...")
     data = {}
     for name, cfg in INDICES.items():
         closes = fetch_ticker(cfg["ticker"])
-        if closes is not None:
-            current = float(closes.iloc[-1])
-            prev    = float(closes.iloc[-2])
+        if closes:
+            current = float(closes[-1])
+            prev    = float(closes[-2])
             change  = ((current - prev) / prev) * 100
-            history = [float(x) for x in closes.tolist()[-5:]]
-            data[name] = {
-                "price":   current,
-                "change":  change,
-                "history": history,
-                "devise":  cfg["devise"],
-            }
+            history = [float(x) for x in closes[-5:]]
+            data[name] = {"price": current, "change": change, "history": history, "devise": cfg["devise"]}
             print(f"   ✓ {name}: {current:.2f} ({change:+.2f}%)")
         else:
             print(f"   ⚠️  {name}: données indisponibles")
@@ -91,10 +97,9 @@ def fetch_market_data():
     return data
 
 # ════════════════════════════════════════════════════════════════
-# 2. ACTUALITÉS (RSS)
+# 2. ACTUALITÉS
 # ════════════════════════════════════════════════════════════════
 def fetch_news():
-    """Récupère les dernières actualités via flux RSS."""
     print("📰  Récupération des actualités RSS...")
     articles = []
     for url in RSS_FEEDS:
@@ -107,28 +112,22 @@ def fetch_news():
                     articles.append({"title": title, "link": link})
             print(f"   ✓ {len(feed.entries)} articles depuis {url.split('/')[2]}")
         except Exception as e:
-            print(f"   ⚠️  Erreur RSS {url}: {e}")
+            print(f"   ⚠️  {url}: {e}")
     return articles[:20]
 
 # ════════════════════════════════════════════════════════════════
 # 3. ANALYSE GROQ
 # ════════════════════════════════════════════════════════════════
 def generate_analysis(market_data, news_articles):
-    """Utilise Groq pour analyser et rédiger le rapport."""
     print("🤖  Génération de l'analyse via Groq...")
-
     now      = datetime.now(PARIS_TZ)
     date_str = now.strftime("%A %d %B %Y à %H:%M")
-
     market_str = "\n".join(
         f"- {name}: {d['price']:.2f} ({d['change']:+.2f}%)"
-        for name, d in market_data.items()
-        if d["price"] > 0
-    ) or "Données de marché indisponibles ce jour."
-
+        for name, d in market_data.items() if d["price"] > 0
+    ) or "Données de marché indisponibles."
     news_str = "\n".join(
-        f"- {a['title']} | {a['link']}"
-        for a in news_articles
+        f"- {a['title']} | {a['link']}" for a in news_articles
     ) or "Pas d'actualités disponibles."
 
     prompt = f"""Tu es un analyste financier senior francophone. Nous sommes le {date_str}.
@@ -151,12 +150,12 @@ Génère un rapport JSON. Réponds UNIQUEMENT avec du JSON valide, sans balise m
     }}
   ],
   "analyse": "Analyse globale en 3-4 phrases sur la situation des marchés aujourd'hui.",
-  "recommandation": "Recommandation prudente en 3-4 phrases pour un investisseur particulier. Terminer par un rappel que ce n'est pas un conseil financier officiel.",
-  "concept_titre": "Un concept économique ou financier pertinent par rapport à l'actualité du jour",
-  "concept_definition": "Explication simple en 3-4 phrases, accessible à quelqu'un qui débute en finance."
+  "recommandation": "Recommandation prudente en 3-4 phrases. Terminer par un rappel que ce n'est pas un conseil financier officiel.",
+  "concept_titre": "Un concept économique pertinent par rapport à l'actualité du jour",
+  "concept_definition": "Explication simple en 3-4 phrases, accessible à un débutant en finance."
 }}
 
-Sélectionne 6 à 8 actualités. Utilise UNIQUEMENT les URLs fournies, ne les invente pas."""
+Sélectionne 6 à 8 actualités. Utilise UNIQUEMENT les URLs fournies."""
 
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
@@ -170,7 +169,7 @@ Sélectionne 6 à 8 actualités. Utilise UNIQUEMENT les URLs fournies, ne les in
     return json.loads(text.strip())
 
 # ════════════════════════════════════════════════════════════════
-# 4. GÉNÉRATION HTML
+# 4. HTML
 # ════════════════════════════════════════════════════════════════
 def sparkline_svg(values):
     if not values or len(values) < 2:
@@ -184,20 +183,17 @@ def sparkline_svg(values):
         y = h - ((v - mn) / rng) * h
         pts.append(f"{x:.1f},{y:.1f}")
     color = "#22c55e" if values[-1] >= values[0] else "#ef4444"
-    polyline_pts = " ".join(pts)
-    return f'<svg width="{w}" height="{h}" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg"><polyline points="{polyline_pts}" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    return f'<svg width="{w}" height="{h}" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg"><polyline points="{" ".join(pts)}" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 
 def generate_html(market_data, analysis, now):
     date_fr  = now.strftime("%A %d %B %Y")
     heure_fr = now.strftime("%H:%M")
     period   = "Rapport du matin" if now.hour < 13 else "Rapport du soir"
-
     analyse_txt        = analysis.get("analyse", "")
     recommandation_txt = analysis.get("recommandation", "")
     concept_titre      = analysis.get("concept_titre", "")
     concept_def        = analysis.get("concept_definition", "")
 
-    # ── Indices ──────────────────────────────────────────────────
     indices_html = ""
     for name, d in market_data.items():
         sign    = "+" if d["change"] >= 0 else ""
@@ -220,7 +216,6 @@ def generate_html(market_data, analysis, now):
           <div class="index-right" style="color:{color}">{arrow} {sign}{d["change"]:.2f}%</div>
         </div>"""
 
-    # ── News ─────────────────────────────────────────────────────
     impact_colors = {
         "haussier": ("#dcfce7", "#166534", "↑"),
         "baissier": ("#fee2e2", "#991b1b", "↓"),
@@ -229,10 +224,10 @@ def generate_html(market_data, analysis, now):
     news_html = ""
     for item in analysis.get("news", []):
         impact = item.get("impact", "neutre")
-        bg, fg, arrow_i = impact_colors.get(impact, impact_colors["neutre"])
+        bg, fg, arr = impact_colors.get(impact, impact_colors["neutre"])
         news_html += f"""
         <div class="news-item">
-          <span class="impact-badge" style="background:{bg};color:{fg}">{arrow_i} {impact}</span>
+          <span class="impact-badge" style="background:{bg};color:{fg}">{arr} {impact}</span>
           <a href="{item.get('url','#')}" target="_blank" rel="noopener">{item.get('titre','')}</a>
           <span class="news-raison">{item.get('raison','')}</span>
         </div>"""
@@ -240,11 +235,10 @@ def generate_html(market_data, analysis, now):
     return f"""<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Market Report — {date_fr}</title>
 <style>
-  :root {{--bg:#0f172a;--surface:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--accent:#38bdf8;--border:#334155;}}
+  :root{{--bg:#0f172a;--surface:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--accent:#38bdf8;--border:#334155;}}
   *{{box-sizing:border-box;margin:0;padding:0;}}
   body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}}
   .container{{max-width:860px;margin:0 auto;padding:2rem 1rem;}}
@@ -275,10 +269,7 @@ def generate_html(market_data, analysis, now):
 <div class="container">
   <header>
     <div class="header-top">
-      <div>
-        <div class="report-title">📊 Market Report</div>
-        <div class="period-badge">{period}</div>
-      </div>
+      <div><div class="report-title">📊 Market Report</div><div class="period-badge">{period}</div></div>
       <div class="report-date">{date_fr}<br>Mis à jour à {heure_fr}</div>
     </div>
   </header>
